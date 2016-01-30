@@ -1,7 +1,10 @@
 $('document').ready(function () {
     $('#addNewBtn').on('click', SBN.showAddNewModal);
     $('#createBtn').on('click', SBN.addStickyNote);
+    SBN.fetchSBNData();
+    SBN.renderNotes();
     setInterval(SBN.refreshDOM, 1000);
+    setInterval(SBN.saveSBNData, 5000);
 });
 
 SBN = {};
@@ -74,5 +77,19 @@ SBN.updateNotePositions = function () {
     for (var i=0; i<notes.length; i++) {
         SBN.data[i].left = notes[i].style.left;
         SBN.data[i].top = notes[i].style.top;
+    }
+};
+
+SBN.saveSBNData = function () {
+    if (typeof(Storage) !== "undefined") {
+        localStorage.setItem('SBNData', JSON.stringify(SBN.data));
+    }
+};
+
+SBN.fetchSBNData = function () {
+    if (typeof(Storage) !== "undefined") {
+        if (localStorage.getItem('SBNData')) {
+            SBN.data = JSON.parse(localStorage.getItem('SBNData'));
+        }
     }
 };
