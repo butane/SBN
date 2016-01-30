@@ -1,8 +1,10 @@
 $('document').ready(function () {
     $('#addNewBtn').on('click', SBN.showAddNewModal);
     $('#createBtn').on('click', SBN.addStickyNote);
+    $('#currentTime').on('click', SBN.toggleTimeFormat);
     SBN.fetchSBNData();
     SBN.renderNotes();
+    SBN.updateTime();
     setInterval(SBN.intervalJobs, 1000);
 });
 
@@ -13,6 +15,10 @@ SBN.data = new Array();
 SBN.__config = {
     intervalCount: 0,
     requireSave: false
+};
+
+SBN.config = {
+    timeFormat: '24h'
 };
 
 SBN.intervalJobs = function () {
@@ -31,10 +37,24 @@ SBN.updateTime = function () {
     var hours = d.getHours();
     var minutes = d.getMinutes();
     var seconds = d.getSeconds();
+    var meridies = '';
+    if (SBN.config.timeFormat == '12h') {
+        if (hours >= 12) {
+            meridies = ' PM';
+        } else {
+            meridies = ' AM';
+        }
+        if (hours>12) {
+            hours -= 12;
+        }
+        if (hours == 0) {
+            hours = 12;
+        }
+    }
     hours = hours<10?"0"+hours:hours;
     minutes = minutes<10?"0"+minutes:minutes;
     seconds = seconds<10?"0"+seconds:seconds;
-    var timeString = hours + ":" + minutes + ":" + seconds;
+    var timeString = hours + ":" + minutes + ":" + seconds + meridies;
     $('#currentTime').html(timeString);
 };
 
@@ -96,6 +116,7 @@ SBN.updateNotePositions = function () {
 SBN.saveSBNData = function () {
     if (typeof(Storage) !== "undefined") {
         localStorage.setItem('SBNData', JSON.stringify(SBN.data));
+        localStorage.setItem('SBNConfig', JSON.stringify(SBN.config));
     }
 };
 
@@ -104,5 +125,18 @@ SBN.fetchSBNData = function () {
         if (localStorage.getItem('SBNData')) {
             SBN.data = JSON.parse(localStorage.getItem('SBNData'));
         }
+        if (localStorage.getItem('SBNConfig')) {
+            SBN.config = JSON.parse(localStorage.getItem('SBNConfig'));
+        }
     }
+};
+
+SBN.toggleTimeFormat = function () {
+    if (SBN.config.timeFormat == '24h') {
+        SBN.config.timeFormat = '12h';
+    } else {
+        SBN.config.timeFormat = '24h';
+    }
+    SBN.__config.requireSave = true;
+    SBN.updateTime();
 };
