@@ -81,12 +81,13 @@ SBN.addStickyNote = function () {
 
 SBN.__stickyNote = function (note) {
     var sWrapper = $('<div>');
-    var sTitle = $('<center><h4>'+note.title+'</h4></center>');
-    var sDescription = $('<center>'+note.description+'</center>');
-    sWrapper.append(sTitle);
-    sWrapper.append($('<br>'));
-    sWrapper.append(sDescription);
-    sWrapper.addClass('stickynote');
+    var sTitle = $('<div>');
+    var sDescription = $('<div>');
+    var sControls = $('<div>');
+    sTitle.html(note.title).addClass('sTitle');
+    sDescription.html(note.description).addClass('sDescription');
+    sControls.addClass('sControls');
+    sWrapper.append(sTitle).append(sDescription).append(sControls).addClass('stickynote');
     if (note.top && note.left) {
         sWrapper.css({position: 'relative', top: note.top, left: note.left});
     }
