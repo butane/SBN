@@ -44,14 +44,17 @@ SBN.addStickyNote = function () {
     }
 };
 
-SBN.__stickyNote = function (title, description) {
+SBN.__stickyNote = function (note) {
     var sWrapper = $('<div>');
-    sWrapper.addClass('stickynote');
-    var sTitle = $('<center><h4>'+title+'</h4></center>');
-    var sDescription = $('<center>'+description+'</center>');
+    var sTitle = $('<center><h4>'+note.title+'</h4></center>');
+    var sDescription = $('<center>'+note.description+'</center>');
     sWrapper.append(sTitle);
     sWrapper.append($('<br>'));
     sWrapper.append(sDescription);
+    sWrapper.addClass('stickynote');
+    if (note.top && note.left) {
+        sWrapper.css({position: 'relative', top: note.top, left: note.left});
+    }
     return sWrapper;
 };
 
@@ -60,8 +63,16 @@ SBN.renderNotes = function () {
     if (SBN.data.length > 0) {
         var notes = SBN.data;
         for (i in notes) {
-            $('#notesContainer').append(SBN.__stickyNote(notes[i].title, notes[i].description));
+            $('#notesContainer').append(SBN.__stickyNote(notes[i]));
         }
     }
-    $(".stickynote").draggable({ containment: "parent", stack: ".stickynote" });
+    $(".stickynote").draggable({ containment: "parent", stack: ".stickynote", stop: SBN.updateNotePositions });
+};
+
+SBN.updateNotePositions = function () {
+    var notes = $('.stickynote');
+    for (var i=0; i<notes.length; i++) {
+        SBN.data[i].left = notes[i].style.left;
+        SBN.data[i].top = notes[i].style.top;
+    }
 };
