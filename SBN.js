@@ -3,16 +3,27 @@ $('document').ready(function () {
     $('#createBtn').on('click', SBN.addStickyNote);
     SBN.fetchSBNData();
     SBN.renderNotes();
-    setInterval(SBN.refreshDOM, 1000);
-    setInterval(SBN.saveSBNData, 5000);
+    setInterval(SBN.intervalJobs, 1000);
 });
 
 SBN = {};
 
 SBN.data = new Array();
 
-SBN.refreshDOM = function () {
+SBN.__config = {
+    intervalCount: 0,
+    requireSave: false
+};
+
+SBN.intervalJobs = function () {
+    SBN.__config.intervalCount++;
+    if (SBN.__config.intervalCount > 3600) {
+        SBN.__config.intervalCount = 0; //Resets every hour
+    }
     SBN.updateTime();
+    if (SBN.__config.requireSave) {
+        SBN.saveSBNData();
+    }
 };
 
 SBN.updateTime = function () {
@@ -42,6 +53,7 @@ SBN.addStickyNote = function () {
             description: description
         };
         SBN.data.push(sNote);
+        SBN.__config.requireSave = true;
         $('#addNoteModal').modal('hide');
         SBN.renderNotes();
     }
@@ -78,6 +90,7 @@ SBN.updateNotePositions = function () {
         SBN.data[i].left = notes[i].style.left;
         SBN.data[i].top = notes[i].style.top;
     }
+    SBN.__config.requireSave = true;
 };
 
 SBN.saveSBNData = function () {
