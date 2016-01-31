@@ -29,6 +29,7 @@ SBN.intervalJobs = function () {
     SBN.updateTime();
     if (SBN.__config.requireSave) {
         SBN.saveSBNData();
+        SBN.__config.requireSave = false;
     }
 };
 
@@ -79,17 +80,52 @@ SBN.addStickyNote = function () {
     }
 };
 
-SBN.__stickyNote = function (note) {
+SBN.deleteStickyNote = function () {
+    var indexId = $(this).attr('data-indexId');
+    var sNote = $(this).parent().parent();
+    SBN.data.splice(indexId, 1);
+    SBN.__compensateNotePositions(indexId, sNote.css('width'));
+    SBN.__config.requireSave = true;
+    SBN.renderNotes();
+};
+
+SBN.__compensateNotePositions = function (fromNote, pixels) {
+    var fixedCompensations = 10;
+    for (var i=fromNote; i<SBN.data.length; i++) {
+        if (SBN.data[i].left) {
+            SBN.data[i].left = parseInt(SBN.data[i].left) + parseInt(pixels) + fixedCompensations;
+        } else {
+            SBN.data[i].left = parseInt(pixels) + fixedCompensations;
+        }
+        SBN.data[i].left += "px";
+    }
+};
+
+SBN.__stickyNoteControls = function (indexId) {
+    var sControls = $('<div>');
+    sControls.addClass('sControls');
+    sControls.append($('<span>').addClass('glyphicon glyphicon-edit editNote').attr('data-indexId', indexId));
+    sControls.append($('<span>').addClass('glyphicon glyphicon-remove deleteNote').attr('data-indexId', indexId));
+    return sControls;
+};
+
+SBN.__stickyNote = function (note, indexId) {
     var sWrapper = $('<div>');
     var sTitle = $('<div>');
     var sDescription = $('<div>');
-    var sControls = $('<div>');
+    
     sTitle.html(note.title).addClass('sTitle');
     sDescription.html(note.description).addClass('sDescription');
-    sControls.addClass('sControls');
-    sWrapper.append(sTitle).append(sDescription).append(sControls).addClass('stickynote');
-    if (note.top && note.left) {
-        sWrapper.css({position: 'relative', top: note.top, left: note.left});
+    
+    sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId)).addClass('stickynote');
+    if (note.top || note.left) {
+        sWrapper.css({position: 'relative'});
+    }
+    if (note.top) {
+        sWrapper.css({top: note.top});
+    }
+    if (note.left) {
+        sWrapper.css({left: note.left});
     }
     return sWrapper;
 };
@@ -99,13 +135,14 @@ SBN.renderNotes = function () {
     if (SBN.data.length > 0) {
         var notes = SBN.data;
         for (i in notes) {
-            $('#notesContainer').append(SBN.__stickyNote(notes[i]));
+            $('#notesContainer').append(SBN.__stickyNote(notes[i], i));
         }
     }
-    $(".stickynote").draggable({ containment: "parent", stack: ".stickynote", stop: SBN.updateNotePositions });
+    $(".stickynote").draggable({ containment: "parent", stack: ".stickynote", stop: SBN.saveNotePositions });
+    $('.sControls').on('click', '.deleteNote', SBN.deleteStickyNote);
 };
 
-SBN.updateNotePositions = function () {
+SBN.saveNotePositions = function () {
     var notes = $('.stickynote');
     for (var i=0; i<notes.length; i++) {
         SBN.data[i].left = notes[i].style.left;
