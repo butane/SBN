@@ -34,10 +34,12 @@ body {
     font-weight: bold;
     font-size: medium;
     text-align: center;
+    word-wrap: break-word;
 }
 .sDescription {
     padding: 0 10px 20px 10px;
     text-align: center;
+    word-wrap: break-word;
 }
 .sControls {
     display: none;

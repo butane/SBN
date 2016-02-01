@@ -109,13 +109,34 @@ SBN.__stickyNoteControls = function (indexId) {
     return sControls;
 };
 
+SBN.__escapeHTML = function (data) {
+    if (typeof(data) == "string") {
+        var result = "";
+        if (data.length>0) {
+            for (i in data) {
+                if (data[i] == '&') {
+                    result += '&amp;';
+                } else if (data[i] == '<') {
+                    result += '&lt;';
+                } else if (data[i] == '>') {
+                    result += '&gt;';
+                } else {
+                    result += data[i];
+                }
+            }
+        }
+        return result;
+    }
+    return false;
+};
+
 SBN.__stickyNote = function (note, indexId) {
     var sWrapper = $('<div>');
     var sTitle = $('<div>');
     var sDescription = $('<div>');
     
-    sTitle.html(note.title).addClass('sTitle');
-    sDescription.html(note.description).addClass('sDescription');
+    sTitle.html(SBN.__escapeHTML(note.title)).addClass('sTitle');
+    sDescription.html(SBN.__escapeHTML(note.description)).addClass('sDescription');
     
     sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId)).addClass('stickynote');
     if (note.top || note.left) {
