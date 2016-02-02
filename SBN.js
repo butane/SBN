@@ -146,7 +146,7 @@ SBN.__stickyNote = function (note, indexId) {
     sDescription.html(SBN.__processText(SBN.__escapeHTML(note.description))).addClass('sDescription');
     
     sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId)).addClass('stickynote');
-    if (note.top || note.left) {
+    if (note.top || note.left || note.zIndex) {
         sWrapper.css({position: 'relative'});
     }
     if (note.top) {
@@ -154,6 +154,9 @@ SBN.__stickyNote = function (note, indexId) {
     }
     if (note.left) {
         sWrapper.css({left: note.left});
+    }
+    if (note.zIndex) {
+        sWrapper.css({"z-index": note.zIndex});
     }
     return sWrapper;
 };
@@ -175,6 +178,7 @@ SBN.saveNotePositions = function () {
     for (var i=0; i<notes.length; i++) {
         SBN.data[i].left = notes[i].style.left;
         SBN.data[i].top = notes[i].style.top;
+        SBN.data[i].zIndex = notes[i].style.zIndex;
     }
     SBN.__config.requireSave = true;
 };
