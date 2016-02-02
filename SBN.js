@@ -130,13 +130,20 @@ SBN.__escapeHTML = function (data) {
     return false;
 };
 
+SBN.__processText = function (data) {
+    if (typeof(data) == "string") {
+        data = data.replace(new RegExp("\n", 'g'), "<br>");
+    }
+    return data;
+};
+
 SBN.__stickyNote = function (note, indexId) {
     var sWrapper = $('<div>');
     var sTitle = $('<div>');
     var sDescription = $('<div>');
     
     sTitle.html(SBN.__escapeHTML(note.title)).addClass('sTitle');
-    sDescription.html(SBN.__escapeHTML(note.description)).addClass('sDescription');
+    sDescription.html(SBN.__processText(SBN.__escapeHTML(note.description))).addClass('sDescription');
     
     sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId)).addClass('stickynote');
     if (note.top || note.left) {
