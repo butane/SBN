@@ -82,23 +82,10 @@ SBN.addStickyNote = function () {
 
 SBN.deleteStickyNote = function () {
     var indexId = $(this).attr('data-indexId');
-    var sNote = $(this).parent().parent();
+    //var sNote = $(this).parent().parent();
     SBN.data.splice(indexId, 1);
-    SBN.__compensateNotePositions(indexId, sNote.css('width'));
     SBN.__config.requireSave = true;
     SBN.renderNotes();
-};
-
-SBN.__compensateNotePositions = function (fromNote, pixels) {
-    var fixedCompensations = 10;
-    for (var i=fromNote; i<SBN.data.length; i++) {
-        if (SBN.data[i].left) {
-            SBN.data[i].left = parseInt(SBN.data[i].left) + parseInt(pixels) + fixedCompensations;
-        } else {
-            SBN.data[i].left = parseInt(pixels) + fixedCompensations;
-        }
-        SBN.data[i].left += "px";
-    }
 };
 
 SBN.__stickyNoteControls = function (indexId) {
@@ -146,19 +133,36 @@ SBN.__stickyNote = function (note, indexId) {
     sDescription.html(SBN.__processText(SBN.__escapeHTML(note.description))).addClass('sDescription');
     
     sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId)).addClass('stickynote');
-    if (note.top || note.left || note.zIndex) {
-        sWrapper.css({position: 'relative'});
-    }
-    if (note.top) {
-        sWrapper.css({top: note.top});
-    }
-    if (note.left) {
-        sWrapper.css({left: note.left});
-    }
-    if (note.zIndex) {
-        sWrapper.css({"z-index": note.zIndex});
-    }
+    
     return sWrapper;
+};
+
+SBN.__renderNotePositions = function () {
+    $('.stickynote').each(function (i, e) {
+        var currentPos = $(e).position();
+        if (!SBN.data[i].left) {
+            SBN.data[i].left = currentPos.left;
+        }
+        if (!SBN.data[i].top) {
+            SBN.data[i].top = currentPos.top;
+        }
+        var destinationPos = {
+            left: SBN.data[i].left,
+            top: SBN.data[i].top,
+            zIndex: SBN.data[i].zIndex?SBN.data[i].zIndex:0
+        };
+        var relativePos = {
+            left: destinationPos.left - currentPos.left,
+            top: destinationPos.top - currentPos.top,
+            zIndex: destinationPos.zIndex
+        };
+        $(e).css({
+            position: 'relative',
+            top: relativePos.top+"px",
+            left: relativePos.left+"px",
+            "z-index": relativePos.zIndex
+        });
+    });
 };
 
 SBN.renderNotes = function () {
@@ -169,17 +173,17 @@ SBN.renderNotes = function () {
             $('#notesContainer').append(SBN.__stickyNote(notes[i], i));
         }
     }
+    SBN.__renderNotePositions();
     $(".stickynote").draggable({ containment: "parent", stack: ".stickynote", stop: SBN.saveNotePositions });
     $('.sControls').on('click', '.deleteNote', SBN.deleteStickyNote);
 };
 
 SBN.saveNotePositions = function () {
-    var notes = $('.stickynote');
-    for (var i=0; i<notes.length; i++) {
-        SBN.data[i].left = notes[i].style.left;
-        SBN.data[i].top = notes[i].style.top;
-        SBN.data[i].zIndex = notes[i].style.zIndex;
-    }
+    $('.stickynote').each(function (i, e) {
+        SBN.data[i].left = $(e).position().left;
+        SBN.data[i].top = $(e).position().top;
+        SBN.data[i].zIndex = $(e).css('z-index');
+    });
     SBN.__config.requireSave = true;
 };
 
