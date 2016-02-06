@@ -49,7 +49,7 @@ SBN.updateTime = function () {
     var minutes = d.getMinutes();
     var seconds = d.getSeconds();
     var meridies = '';
-    if (SBN.config.timeFormat == '12h') {
+    if (SBN.config.timeFormat === '12h') {
         if (hours >= 12) {
             meridies = ' PM';
         } else {
@@ -58,7 +58,7 @@ SBN.updateTime = function () {
         if (hours>12) {
             hours -= 12;
         }
-        if (hours == 0) {
+        if (hours === 0) {
             hours = 12;
         }
     }
@@ -94,7 +94,7 @@ SBN.pinStickyNote = function () {
     var indexId = $(this).attr('data-indexId');
     var data = SBN.data[indexId];
     if (data) {
-        if (SBN.data[indexId].pinned && SBN.data[indexId].pinned==true) {
+        if (SBN.data[indexId].pinned && SBN.data[indexId].pinned===true) {
             SBN.data[indexId].pinned = false;
         } else {
             SBN.data[indexId].pinned = true;
@@ -161,7 +161,7 @@ SBN.__stickyNoteControls = function (indexId) {
     var pinNote = $('<span>').addClass('glyphicon glyphicon-pushpin text-muted pinNote').attr('data-indexId', indexId);
     var editNote = $('<span>').addClass('glyphicon glyphicon-edit text-muted editNote').attr('data-indexId', indexId);
     var deleteNote = $('<span>').addClass('glyphicon glyphicon-remove text-muted deleteNote').attr('data-indexId', indexId);
-    if (SBN.data[indexId] && SBN.data[indexId].pinned && SBN.data[indexId].pinned==true) {
+    if (SBN.data[indexId] && SBN.data[indexId].pinned && SBN.data[indexId].pinned===true) {
         pinNote.removeClass('text-muted').addClass('text-success');
     }
     if (SBN.__config.deleteStage.indexId===indexId) {
@@ -178,15 +178,15 @@ SBN.__stickyNoteControls = function (indexId) {
 };
 
 SBN.__escapeHTML = function (data) {
-    if (typeof(data) == "string") {
+    if (typeof(data) === "string") {
         var result = "";
         if (data.length>0) {
             for (i in data) {
-                if (data[i] == '&') {
+                if (data[i] === '&') {
                     result += '&amp;';
-                } else if (data[i] == '<') {
+                } else if (data[i] === '<') {
                     result += '&lt;';
-                } else if (data[i] == '>') {
+                } else if (data[i] === '>') {
                     result += '&gt;';
                 } else {
                     result += data[i];
@@ -199,7 +199,7 @@ SBN.__escapeHTML = function (data) {
 };
 
 SBN.__processText = function (data) {
-    if (typeof(data) == "string") {
+    if (typeof(data) === "string") {
         data = data.replace(new RegExp("\n", 'g'), "<br>");
     }
     return data;
@@ -212,7 +212,7 @@ SBN.__stickyNote = function (note, indexId) {
     sTitle.html(SBN.__escapeHTML(note.title));
     sDescription.html(SBN.__processText(SBN.__escapeHTML(note.description)));
     sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId));
-    if (!note.pinned || note.pinned==false) {
+    if (!note.pinned || note.pinned===false) {
         sWrapper.addClass('draggableStickyNote');
     }
     return sWrapper;
@@ -289,7 +289,7 @@ SBN.fetchSBNData = function () {
 };
 
 SBN.toggleTimeFormat = function () {
-    if (SBN.config.timeFormat == '24h') {
+    if (SBN.config.timeFormat === '24h') {
         SBN.config.timeFormat = '12h';
     } else {
         SBN.config.timeFormat = '24h';
