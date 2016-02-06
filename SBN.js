@@ -1,6 +1,12 @@
 $('document').ready(function () {
     $('#addNewBtn').on('click', SBN.showAddNewModal);
+    $('#addNoteModal').on('shown.bs.modal', function() {
+        $('#addNoteModal .noteTitle').focus();
+    });
     $('#addNoteModal .createBtn').on('click', SBN.addStickyNote);
+    $('#editNoteModal').on('shown.bs.modal', function() {
+        $('#editNoteModal .noteTitle').focus();
+    });
     $('#editNoteModal .updateBtn').on('click', SBN.updateStickyNote);
     $('#currentTime').on('click', SBN.toggleTimeFormat);
     SBN.fetchSBNData();
