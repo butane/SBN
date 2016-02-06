@@ -81,6 +81,20 @@ SBN.addStickyNote = function () {
     }
 };
 
+SBN.pinStickyNote = function () {
+    var indexId = $(this).attr('data-indexId');
+    var data = SBN.data[indexId];
+    if (data) {
+        if (SBN.data[indexId].pinned && SBN.data[indexId].pinned==true) {
+            SBN.data[indexId].pinned = false;
+        } else {
+            SBN.data[indexId].pinned = true;
+        }
+        SBN.__config.requireSave = true;
+        SBN.renderNotes();
+    }
+};
+
 SBN.deleteStickyNote = function () {
     var indexId = $(this).attr('data-indexId');
     //var sNote = $(this).parent().parent();
@@ -114,10 +128,18 @@ SBN.updateStickyNote = function () {
 };
 
 SBN.__stickyNoteControls = function (indexId) {
-    var sControls = $('<div>');
-    sControls.addClass('sControls');
-    sControls.append($('<span>').addClass('glyphicon glyphicon-edit editNote').attr('data-indexId', indexId));
-    sControls.append($('<span>').addClass('glyphicon glyphicon-remove deleteNote').attr('data-indexId', indexId));
+    var sControls = $('<div>').addClass('sControls');
+    var leftControls = $('<div>').addClass('leftControls');
+    var rightControls = $('<div>').addClass('rightControls');
+    var pinNote = $('<span>').addClass('glyphicon glyphicon-pushpin pinNote').attr('data-indexId', indexId);
+    var editNote = $('<span>').addClass('glyphicon glyphicon-edit editNote').attr('data-indexId', indexId);
+    var deleteNote = $('<span>').addClass('glyphicon glyphicon-remove deleteNote').attr('data-indexId', indexId);
+    if (SBN.data[indexId] && SBN.data[indexId].pinned && SBN.data[indexId].pinned==true) {
+        pinNote.css('color', 'green');
+    }
+    leftControls.append(pinNote);
+    rightControls.append(editNote).append(deleteNote);
+    sControls.append(leftControls).append(rightControls);
     return sControls;
 };
 
@@ -150,15 +172,15 @@ SBN.__processText = function (data) {
 };
 
 SBN.__stickyNote = function (note, indexId) {
-    var sWrapper = $('<div>');
-    var sTitle = $('<div>');
-    var sDescription = $('<div>');
-    
-    sTitle.html(SBN.__escapeHTML(note.title)).addClass('sTitle');
-    sDescription.html(SBN.__processText(SBN.__escapeHTML(note.description))).addClass('sDescription');
-    
-    sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId)).addClass('stickynote');
-    
+    var sWrapper = $('<div>').addClass('stickynote');
+    var sTitle = $('<div>').addClass('sTitle');
+    var sDescription = $('<div>').addClass('sDescription');
+    sTitle.html(SBN.__escapeHTML(note.title));
+    sDescription.html(SBN.__processText(SBN.__escapeHTML(note.description)));
+    sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId));
+    if (!note.pinned || note.pinned==false) {
+        sWrapper.addClass('draggableStickyNote');
+    }
     return sWrapper;
 };
 
@@ -199,7 +221,8 @@ SBN.renderNotes = function () {
         }
     }
     SBN.__renderNotePositions();
-    $(".stickynote").draggable({ containment: "parent", stack: ".stickynote", stop: SBN.saveNotePositions });
+    $(".draggableStickyNote").draggable({ containment: "parent", stack: ".stickynote", stop: SBN.saveNotePositions, cancel: ".sControls" });
+    $('.sControls').on('click', '.pinNote', SBN.pinStickyNote);
     $('.sControls').on('click', '.deleteNote', SBN.deleteStickyNote);
     $('.sControls').on('click', '.editNote', SBN.showEditModal);
 };
