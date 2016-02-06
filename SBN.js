@@ -1,6 +1,7 @@
 $('document').ready(function () {
     $('#addNewBtn').on('click', SBN.showAddNewModal);
     $('#addNoteModal .createBtn').on('click', SBN.addStickyNote);
+    $('#editNoteModal .updateBtn').on('click', SBN.updateStickyNote);
     $('#currentTime').on('click', SBN.toggleTimeFormat);
     SBN.fetchSBNData();
     SBN.renderNotes();
@@ -86,6 +87,30 @@ SBN.deleteStickyNote = function () {
     SBN.data.splice(indexId, 1);
     SBN.__config.requireSave = true;
     SBN.renderNotes();
+};
+
+SBN.showEditModal = function () {
+    var indexId = $(this).attr('data-indexId');
+    var data = SBN.data[indexId];
+    if (data) {
+        $('#editNoteModal .noteIndexId').val(indexId);
+        $('#editNoteModal .noteTitle').val(data.title);
+        $('#editNoteModal .noteDescription').val(data.description);
+        $('#editNoteModal').modal('show');
+    }
+};
+
+SBN.updateStickyNote = function () {
+    var indexId = $('#editNoteModal .noteIndexId').val();
+    var title = $('#editNoteModal .noteTitle').val();
+    var description = $('#editNoteModal .noteDescription').val();
+    if (SBN.data[indexId] && (title.length>0 || description.length>0)) {
+        SBN.data[indexId].title = title;
+        SBN.data[indexId].description = description;
+        SBN.__config.requireSave = true;
+        $('#editNoteModal').modal('hide');
+        SBN.renderNotes();
+    }
 };
 
 SBN.__stickyNoteControls = function (indexId) {
@@ -176,6 +201,7 @@ SBN.renderNotes = function () {
     SBN.__renderNotePositions();
     $(".stickynote").draggable({ containment: "parent", stack: ".stickynote", stop: SBN.saveNotePositions });
     $('.sControls').on('click', '.deleteNote', SBN.deleteStickyNote);
+    $('.sControls').on('click', '.editNote', SBN.showEditModal);
 };
 
 SBN.saveNotePositions = function () {
