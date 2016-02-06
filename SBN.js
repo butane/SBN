@@ -15,7 +15,8 @@ SBN.data = new Array();
 
 SBN.__config = {
     intervalCount: 0,
-    requireSave: false
+    requireSave: false,
+    deleteStage: {indexId: false, stage: false, lastUpdate: false}
 };
 
 SBN.config = {
@@ -31,6 +32,14 @@ SBN.intervalJobs = function () {
     if (SBN.__config.requireSave) {
         SBN.saveSBNData();
         SBN.__config.requireSave = false;
+    }
+    if (SBN.__config.intervalCount%10===0) { //Every 10 seconds
+        if (SBN.__config.deleteStage.lastUpdate && (Date.now() - SBN.__config.deleteStage.lastUpdate > 10000)) {
+            SBN.__config.deleteStage.indexId = false;
+            SBN.__config.deleteStage.stage = false;
+            SBN.__config.deleteStage.lastUpdate = false;
+            SBN.renderNotes();
+        }
     }
 };
 
@@ -97,9 +106,27 @@ SBN.pinStickyNote = function () {
 
 SBN.deleteStickyNote = function () {
     var indexId = $(this).attr('data-indexId');
-    //var sNote = $(this).parent().parent();
-    SBN.data.splice(indexId, 1);
-    SBN.__config.requireSave = true;
+    if (SBN.__config.deleteStage.indexId === indexId) {
+        if (SBN.__config.deleteStage.stage === false) {
+            SBN.__config.deleteStage.stage = 0;
+            SBN.__config.deleteStage.lastUpdate = Date.now();
+        } else {
+            SBN.__config.deleteStage.stage++;
+            SBN.__config.deleteStage.lastUpdate = Date.now();
+        }
+        if (SBN.__config.deleteStage.stage > 1) {
+            //var sNote = $(this).parent().parent();
+            SBN.data.splice(indexId, 1);
+            SBN.__config.requireSave = true;
+            SBN.__config.deleteStage.indexId = false;
+            SBN.__config.deleteStage.stage = false;
+            SBN.__config.deleteStage.lastUpdate = false;
+        }
+    } else {
+        SBN.__config.deleteStage.indexId = indexId;
+        SBN.__config.deleteStage.stage = 0;
+        SBN.__config.deleteStage.lastUpdate = Date.now();
+    }
     SBN.renderNotes();
 };
 
@@ -136,6 +163,13 @@ SBN.__stickyNoteControls = function (indexId) {
     var deleteNote = $('<span>').addClass('glyphicon glyphicon-remove text-muted deleteNote').attr('data-indexId', indexId);
     if (SBN.data[indexId] && SBN.data[indexId].pinned && SBN.data[indexId].pinned==true) {
         pinNote.removeClass('text-muted').addClass('text-success');
+    }
+    if (SBN.__config.deleteStage.indexId===indexId) {
+        if (SBN.__config.deleteStage.stage===0) {
+            deleteNote.removeClass('text-muted').addClass('text-warning');
+        } else if (SBN.__config.deleteStage.stage===1) {
+            deleteNote.removeClass('text-muted').addClass('text-danger');
+        }
     }
     leftControls.append(pinNote);
     rightControls.append(editNote).append(deleteNote);
