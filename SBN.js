@@ -1,6 +1,6 @@
 $('document').ready(function () {
     $('#addNewBtn').on('click', SBN.showAddNewModal);
-    $('#createBtn').on('click', SBN.addStickyNote);
+    $('#addNoteModal .createBtn').on('click', SBN.addStickyNote);
     $('#currentTime').on('click', SBN.toggleTimeFormat);
     SBN.fetchSBNData();
     SBN.renderNotes();
@@ -60,14 +60,14 @@ SBN.updateTime = function () {
 };
 
 SBN.showAddNewModal = function () {
-    $('#noteTitle').val('');
-    $('#noteDescription').val('');
+    $('#addNoteModal .noteTitle').val('');
+    $('#addNoteModal .noteDescription').val('');
     $('#addNoteModal').modal('show');
 };
 
 SBN.addStickyNote = function () {
-    var title = $('#noteTitle').val();
-    var description = $('#noteDescription').val();
+    var title = $('#addNoteModal .noteTitle').val();
+    var description = $('#addNoteModal .noteDescription').val();
     if (title.length>0 || description.length>0) {
         var sNote = {
             title: title,
