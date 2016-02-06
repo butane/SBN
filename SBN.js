@@ -131,11 +131,11 @@ SBN.__stickyNoteControls = function (indexId) {
     var sControls = $('<div>').addClass('sControls');
     var leftControls = $('<div>').addClass('leftControls');
     var rightControls = $('<div>').addClass('rightControls');
-    var pinNote = $('<span>').addClass('glyphicon glyphicon-pushpin pinNote').attr('data-indexId', indexId);
-    var editNote = $('<span>').addClass('glyphicon glyphicon-edit editNote').attr('data-indexId', indexId);
-    var deleteNote = $('<span>').addClass('glyphicon glyphicon-remove deleteNote').attr('data-indexId', indexId);
+    var pinNote = $('<span>').addClass('glyphicon glyphicon-pushpin text-muted pinNote').attr('data-indexId', indexId);
+    var editNote = $('<span>').addClass('glyphicon glyphicon-edit text-muted editNote').attr('data-indexId', indexId);
+    var deleteNote = $('<span>').addClass('glyphicon glyphicon-remove text-muted deleteNote').attr('data-indexId', indexId);
     if (SBN.data[indexId] && SBN.data[indexId].pinned && SBN.data[indexId].pinned==true) {
-        pinNote.css('color', 'green');
+        pinNote.removeClass('text-muted').addClass('text-success');
     }
     leftControls.append(pinNote);
     rightControls.append(editNote).append(deleteNote);
