@@ -1,14 +1,31 @@
 $('document').ready(function () {
     $('#addNewBtn').on('click', SBN.showAddNewModal);
+    $('#addNoteModal').on('show.bs.modal', function() {
+        SBN.__config.addNoteModalState = 1;
+    });
     $('#addNoteModal').on('shown.bs.modal', function() {
         $('#addNoteModal .noteTitle').focus();
     });
+    $('#addNoteModal').on('hidden.bs.modal', function() {
+        SBN.__config.addNoteModalState = 0;
+    });
     $('#addNoteModal .createBtn').on('click', SBN.addStickyNote);
+    $('#editNoteModal').on('show.bs.modal', function() {
+        SBN.__config.editNoteModalState = 1;
+    });
     $('#editNoteModal').on('shown.bs.modal', function() {
         $('#editNoteModal .noteTitle').focus();
     });
+    $('#editNoteModal').on('hidden.bs.modal', function() {
+        SBN.__config.editNoteModalState = 0;
+    });
     $('#editNoteModal .updateBtn').on('click', SBN.updateStickyNote);
     $('#currentTime').on('click', SBN.toggleTimeFormat);
+    $('body').on('keyup', function(e) {
+        if (e.which===78 && SBN.__config.addNoteModalState===0 && SBN.__config.editNoteModalState===0) {
+            SBN.showAddNewModal();
+        }
+    });
     SBN.fetchSBNData();
     SBN.renderNotes();
     SBN.updateTime();
@@ -22,7 +39,9 @@ SBN.data = new Array();
 SBN.__config = {
     intervalCount: 0,
     requireSave: false,
-    deleteStage: {indexId: false, stage: false, lastUpdate: false}
+    deleteStage: {indexId: false, stage: false, lastUpdate: false},
+    addNoteModalState: 0,
+    editNoteModalState: 0
 };
 
 SBN.config = {
