@@ -103,10 +103,16 @@ SBN.showAddNewModal = function () {
 SBN.addStickyNote = function () {
     var title = $('#addNoteModal .noteTitle').val();
     var description = $('#addNoteModal .noteDescription').val();
+    var hours = $('#addNoteModal .noteTimeHours').val();
+    var minutes = $('#addNoteModal .noteTimeMinutes').val();
+    var seconds = $('#addNoteModal .noteTimeSeconds').val();
+    //parseInt
+    console.log(((hours*3600 + minutes*60 + seconds)*1000));
     if (title.length>0 || description.length>0) {
         var sNote = {
             title: title,
-            description: description
+            description: description,
+            reminderTime: new Date(Date.now() + ((hours*3600 + minutes*60 + seconds)*1000))
         };
         SBN.data.push(sNote);
         SBN.__config.requireSave = true;
