@@ -1,4 +1,38 @@
 $('document').ready(function () {
+    SBN.populateSelect('.noteTimeYear', SBN.__yearList());
+    SBN.populateSelect('.noteTimeMonth', SBN.__monthList());
+    SBN.populateSelect('.noteTimeDay', SBN.__dayList(SBN.__yearList()[0].value, SBN.__monthList()[0].value));
+    SBN.populateSelect('.noteTimeHours', SBN.__hourList());
+    SBN.populateSelect('.noteTimeMinutes', SBN.__60List());
+    SBN.populateSelect('.noteTimeSeconds', SBN.__60List());
+    $('#addNoteModal .noteTimeYear').on('change', function () {
+        var year = this.value;
+        var month = $('#addNoteModal .noteTimeMonth').val();
+        var day = $('#addNoteModal .noteTimeDay').val();
+        SBN.populateSelect('#addNoteModal .noteTimeDay', SBN.__dayList(year, month));
+        $('#addNoteModal .noteTimeDay').val(day); //Try to keep last selected Day value
+    });
+    $('#addNoteModal .noteTimeMonth').on('change', function () {
+        var month = this.value;
+        var year = $('#addNoteModal .noteTimeYear').val();
+        var day = $('#addNoteModal .noteTimeDay').val();
+        SBN.populateSelect('#addNoteModal .noteTimeDay', SBN.__dayList(year, month));
+        $('#addNoteModal .noteTimeDay').val(day); //Try to keep last selected Day value
+    });
+    $('#editNoteModal .noteTimeYear').on('change', function () {
+        var year = this.value;
+        var month = $('#editNoteModal .noteTimeMonth').val();
+        var day = $('#editNoteModal .noteTimeDay').val();
+        SBN.populateSelect('#editNoteModal .noteTimeDay', SBN.__dayList(year, month));
+        $('#editNoteModal .noteTimeDay').val(day); //Try to keep last selected Day value
+    });
+    $('#editNoteModal .noteTimeMonth').on('change', function () {
+        var month = this.value;
+        var year = $('#editNoteModal .noteTimeYear').val();
+        var day = $('#editNoteModal .noteTimeDay').val();
+        SBN.populateSelect('#editNoteModal .noteTimeDay', SBN.__dayList(year, month));
+        $('#editNoteModal .noteTimeDay').val(day); //Try to keep last selected Day value
+    });
     $('#addNewBtn').on('click', SBN.showAddNewModal);
     $('#addNoteModal').on('show.bs.modal', function() {
         SBN.__config.addNoteModalState = 1;
@@ -97,22 +131,40 @@ SBN.updateTime = function () {
 SBN.showAddNewModal = function () {
     $('#addNoteModal .noteTitle').val('');
     $('#addNoteModal .noteDescription').val('');
+    var date = new Date();
+    $('#addNoteModal .noteTimeYear').val(date.getFullYear());
+    $('#addNoteModal .noteTimeMonth').val(date.getMonth()+1);
+    $('#addNoteModal .noteTimeDay').val(date.getDate());
+    $('#addNoteModal .noteTimeHours').val(date.getHours());
+    $('#addNoteModal .noteTimeMinutes').val(date.getMinutes());
+    $('#addNoteModal .noteTimeSeconds').val(0);
+    $('#addNoteModal .noteTimeMonth').trigger('change');
     $('#addNoteModal').modal('show');
 };
 
 SBN.addStickyNote = function () {
     var title = $('#addNoteModal .noteTitle').val();
     var description = $('#addNoteModal .noteDescription').val();
+    var year = $('#addNoteModal .noteTimeYear').val();
+    var month = $('#addNoteModal .noteTimeMonth').val();
+    var day = $('#addNoteModal .noteTimeDay').val();
     var hours = $('#addNoteModal .noteTimeHours').val();
     var minutes = $('#addNoteModal .noteTimeMinutes').val();
     var seconds = $('#addNoteModal .noteTimeSeconds').val();
-    //parseInt
-    console.log(((hours*3600 + minutes*60 + seconds)*1000));
+    if (isNaN(year) || isNaN(month) || isNaN(day) || isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+        return false;
+    }
+    year = parseInt(year);
+    month = parseInt(month);
+    day = parseInt(day);
+    hours = parseInt(hours);
+    minutes = parseInt(minutes);
+    seconds = parseInt(seconds);
     if (title.length>0 || description.length>0) {
         var sNote = {
             title: title,
             description: description,
-            reminderTime: new Date(Date.now() + ((hours*3600 + minutes*60 + seconds)*1000))
+            reminderTime: new Date(year, month-1, day, hours, minutes, seconds, 0)
         };
         SBN.data.push(sNote);
         SBN.__config.requireSave = true;
@@ -168,6 +220,14 @@ SBN.showEditModal = function () {
         $('#editNoteModal .noteIndexId').val(indexId);
         $('#editNoteModal .noteTitle').val(data.title);
         $('#editNoteModal .noteDescription').val(data.description);
+        var date = new Date(data.reminderTime);
+        $('#editNoteModal .noteTimeYear').val(date.getFullYear());
+        $('#editNoteModal .noteTimeMonth').val(date.getMonth() + 1);
+        $('#editNoteModal .noteTimeDay').val(date.getDate());
+        $('#editNoteModal .noteTimeHours').val(date.getHours());
+        $('#editNoteModal .noteTimeMinutes').val(date.getMinutes());
+        $('#editNoteModal .noteTimeSeconds').val(date.getSeconds());
+        $('#editNoteModal .noteTimeMonth').trigger('change');
         $('#editNoteModal').modal('show');
     }
 };
@@ -176,9 +236,25 @@ SBN.updateStickyNote = function () {
     var indexId = $('#editNoteModal .noteIndexId').val();
     var title = $('#editNoteModal .noteTitle').val();
     var description = $('#editNoteModal .noteDescription').val();
+    var year = $('#editNoteModal .noteTimeYear').val();
+    var month = $('#editNoteModal .noteTimeMonth').val();
+    var day = $('#editNoteModal .noteTimeDay').val();
+    var hours = $('#editNoteModal .noteTimeHours').val();
+    var minutes = $('#editNoteModal .noteTimeMinutes').val();
+    var seconds = $('#editNoteModal .noteTimeSeconds').val();
+    if (isNaN(year) || isNaN(month) || isNaN(day) || isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+        return false;
+    }
+    year = parseInt(year);
+    month = parseInt(month);
+    day = parseInt(day);
+    hours = parseInt(hours);
+    minutes = parseInt(minutes);
+    seconds = parseInt(seconds);
     if (SBN.data[indexId] && (title.length>0 || description.length>0)) {
         SBN.data[indexId].title = title;
         SBN.data[indexId].description = description;
+        SBN.data[indexId].reminderTime = new Date(year, month-1, day, hours, minutes, seconds, 0);
         SBN.__config.requireSave = true;
         $('#editNoteModal').modal('hide');
         SBN.renderNotes();
@@ -327,4 +403,82 @@ SBN.toggleTimeFormat = function () {
     }
     SBN.__config.requireSave = true;
     SBN.updateTime();
+};
+
+SBN.__yearList = function () {
+    var start = 2016;
+    var count = 10;
+    var list = new Array();
+    for (var i=start; i<start+count; i++) {
+        list.push({value: i, display: i});
+    }
+    return list;
+};
+
+SBN.__monthList = function () {
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var list = new Array();
+    for (var i=1; i<=12; i++) {
+        list.push({value: i, display: months[i-1]});
+    }
+    return list;
+};
+
+SBN.__dayList = function (year, month) {
+    if (isNaN(year) || isNaN(month)) {
+        return false;
+    }
+    year = parseInt(year);
+    month = parseInt(month);
+    var dayCount = 31;
+    var list = new Array();
+    if ([4,6,9,11].indexOf(month) > -1) {
+        dayCount = 30;
+    }
+    if (month === 2) {
+        dayCount = 28;
+        if (year%4 === 0) {
+            if (year%100 === 0) {
+                if (year%400 === 0) {
+                    dayCount = 29;
+                }
+            } else {
+                dayCount = 29;
+            }
+        }
+    }
+    for (var i=1; i<=dayCount; i++) {
+        var display = i<10?"0"+i:i.toString();
+        list.push({value: i, display: display});
+    }
+    return list;
+};
+
+SBN.__hourList = function () {
+    var list = new Array();
+    for (var i=0; i<24; i++) {
+        var display = i<10?"0"+i:i.toString();
+        list.push({value: i, display: display});
+    }
+    return list;
+};
+
+SBN.__60List = function () {
+    var list = new Array();
+    for (var i=0; i<60; i++) {
+        var display = i<10?"0"+i:i.toString();
+        list.push({value: i, display: display});
+    }
+    return list;
+};
+
+SBN.populateSelect = function (selectSelector, list) {
+    $(selectSelector).html('');
+    for (i in list) {
+        var option = $('<option>');
+        option.val(list[i].value);
+        option.html(list[i].display);
+        $(selectSelector).append(option);
+    }
+    return true;
 };
