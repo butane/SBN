@@ -73,6 +73,7 @@ SBN.data = new Array();
 SBN.__config = {
     intervalCount: 0,
     requireSave: false,
+    requireRender: false,
     deleteStage: {indexId: false, stage: false, lastUpdate: false},
     addNoteModalState: 0,
     editNoteModalState: 0
@@ -92,12 +93,24 @@ SBN.intervalJobs = function () {
         SBN.saveSBNData();
         SBN.__config.requireSave = false;
     }
+    if (SBN.__config.requireRender) {
+        SBN.renderNotes();
+        SBN.__config.requireRender = false;
+    }
     if (SBN.__config.intervalCount%10===0) { //Every 10 seconds
         if (SBN.__config.deleteStage.lastUpdate && (Date.now() - SBN.__config.deleteStage.lastUpdate > 10000)) {
             SBN.__config.deleteStage.indexId = false;
             SBN.__config.deleteStage.stage = false;
             SBN.__config.deleteStage.lastUpdate = false;
             SBN.renderNotes();
+        }
+        var now = new Date();
+        for (i in SBN.data) {
+            var reminderTime = new Date(SBN.data[i].reminderTime);
+            if (now >= reminderTime) {
+                SBN.__config.requireRender = true;
+                break;
+            }
         }
     }
 };
@@ -161,10 +174,17 @@ SBN.addStickyNote = function () {
     minutes = parseInt(minutes);
     seconds = parseInt(seconds);
     if (title.length>0 || description.length>0) {
+        var reminderTime = new Date(year, month-1, day, hours, minutes, seconds, 0);
+        var now = new Date();
+        var reminderStatus = 'live';
+        if (now >= reminderTime) {
+            reminderStatus = 'done';
+        }
         var sNote = {
             title: title,
             description: description,
-            reminderTime: new Date(year, month-1, day, hours, minutes, seconds, 0)
+            reminderTime: reminderTime,
+            reminderStatus: reminderStatus
         };
         SBN.data.push(sNote);
         SBN.__config.requireSave = true;
@@ -252,9 +272,16 @@ SBN.updateStickyNote = function () {
     minutes = parseInt(minutes);
     seconds = parseInt(seconds);
     if (SBN.data[indexId] && (title.length>0 || description.length>0)) {
+        var reminderTime = new Date(year, month-1, day, hours, minutes, seconds, 0);
+        var now = new Date();
+        var reminderStatus = 'live';
+        if (now >= reminderTime) {
+            reminderStatus = 'done';
+        }
         SBN.data[indexId].title = title;
         SBN.data[indexId].description = description;
-        SBN.data[indexId].reminderTime = new Date(year, month-1, day, hours, minutes, seconds, 0);
+        SBN.data[indexId].reminderTime = reminderTime;
+        SBN.data[indexId].reminderStatus = reminderStatus;
         SBN.__config.requireSave = true;
         $('#editNoteModal').modal('hide');
         SBN.renderNotes();
@@ -321,6 +348,13 @@ SBN.__stickyNote = function (note, indexId) {
     sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId));
     if (!note.pinned || note.pinned===false) {
         sWrapper.addClass('draggableStickyNote');
+    }
+    if (note.reminderStatus === 'live') {
+        var reminderTime = new Date(note.reminderTime);
+        var now = new Date();
+        if (now >= reminderTime) {
+            sWrapper.addClass('reminderLive');
+        }
     }
     return sWrapper;
 };

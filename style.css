@@ -80,3 +80,21 @@ body {
     float: right;
     padding-right: 10px;
 }
+@keyframes reminderAnimation {
+    0% {box-shadow: 5px 5px 5px rgba(200,0,0,1);}
+    10% {box-shadow: 5px 5px 8px rgba(200,0,0,1);}
+    20% {box-shadow: 5px 5px 10px rgba(200,0,0,1);}
+    30% {box-shadow: 5px 5px 12px rgba(200,0,0,1);}
+    40% {box-shadow: 5px 5px 15px rgba(200,0,0,1);}
+    50% {box-shadow: 5px 5px 18px rgba(200,0,0,1);}
+    60% {box-shadow: 5px 5px 15px rgba(200,0,0,1);}
+    70% {box-shadow: 5px 5px 12px rgba(200,0,0,1);}
+    80% {box-shadow: 5px 5px 10px rgba(200,0,0,1);}
+    90% {box-shadow: 5px 5px 8px rgba(200,0,0,1);}
+    100% {box-shadow: 5px 5px 5px rgba(200,0,0,1);}
+}
+.reminderLive {
+    animation-name: reminderAnimation;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
