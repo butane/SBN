@@ -92,20 +92,27 @@ SBN.intervalJobs = function () {
         SBN.saveSBNData();
         SBN.__config.requireSave = false;
     }
+    var now = new Date();
+    var newLiveReminder = false;
+    for (i in SBN.data) {
+        if (SBN.data[i].reminderStatus === 'active') {
+            var reminderTime = new Date(SBN.data[i].reminderTime);
+            if (now >= reminderTime) {
+                SBN.data[i].reminderStatus = 'live';
+                newLiveReminder = true;
+            }
+        }
+    }
+    if (newLiveReminder) {
+        SBN.__config.requireSave = true;
+        SBN.renderNotes();
+    }
     if (SBN.__config.intervalCount%10===0) { //Every 10 seconds
         if (SBN.__config.deleteStage.lastUpdate && (Date.now() - SBN.__config.deleteStage.lastUpdate > 10000)) {
             SBN.__config.deleteStage.indexId = false;
             SBN.__config.deleteStage.stage = false;
             SBN.__config.deleteStage.lastUpdate = false;
             SBN.renderNotes();
-        }
-        var now = new Date();
-        for (i in SBN.data) {
-            var reminderTime = new Date(SBN.data[i].reminderTime);
-            if (now >= reminderTime) {
-                SBN.renderNotes();
-                break;
-            }
         }
     }
 };
@@ -171,7 +178,7 @@ SBN.addStickyNote = function () {
     if (title.length>0 || description.length>0) {
         var reminderTime = new Date(year, month-1, day, hours, minutes, seconds, 0);
         var now = new Date();
-        var reminderStatus = 'live';
+        var reminderStatus = 'active';
         if (now >= reminderTime) {
             reminderStatus = 'done';
         }
@@ -269,7 +276,7 @@ SBN.updateStickyNote = function () {
     if (SBN.data[indexId] && (title.length>0 || description.length>0)) {
         var reminderTime = new Date(year, month-1, day, hours, minutes, seconds, 0);
         var now = new Date();
-        var reminderStatus = 'live';
+        var reminderStatus = 'active';
         if (now >= reminderTime) {
             reminderStatus = 'done';
         }
