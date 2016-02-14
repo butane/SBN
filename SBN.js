@@ -235,8 +235,10 @@ SBN.deleteStickyNote = function () {
     SBN.renderNotes();
 };
 
-SBN.showEditModal = function () {
-    var indexId = $(this).attr('data-indexId');
+SBN.showEditModal = function (indexId) {
+    if (typeof(indexId) === 'undefined') {
+        indexId = $(this).attr('data-indexId');
+    }
     var data = SBN.data[indexId];
     if (data) {
         $('#editNoteModal .noteIndexId').val(indexId);
@@ -295,10 +297,14 @@ SBN.__stickyNoteControls = function (indexId) {
     var leftControls = $('<div>').addClass('leftControls');
     var rightControls = $('<div>').addClass('rightControls');
     var pinNote = $('<span>').addClass('glyphicon glyphicon-pushpin text-muted pinNote').attr('data-indexId', indexId);
+    var reminderControl = $('<span>').addClass('glyphicon glyphicon-time text-muted reminderControl').attr('data-indexId', indexId);
     var editNote = $('<span>').addClass('glyphicon glyphicon-edit text-muted editNote').attr('data-indexId', indexId);
     var deleteNote = $('<span>').addClass('glyphicon glyphicon-remove text-muted deleteNote').attr('data-indexId', indexId);
     if (SBN.data[indexId] && SBN.data[indexId].pinned && SBN.data[indexId].pinned===true) {
         pinNote.removeClass('text-muted').addClass('text-success');
+    }
+    if (SBN.data[indexId] && (SBN.data[indexId].reminderStatus==='active' || SBN.data[indexId].reminderStatus==='live')) {
+        reminderControl.removeClass('text-muted').addClass('text-success');
     }
     if (SBN.__config.deleteStage.indexId===indexId) {
         if (SBN.__config.deleteStage.stage===0) {
@@ -308,7 +314,7 @@ SBN.__stickyNoteControls = function (indexId) {
         }
     }
     leftControls.append(pinNote);
-    rightControls.append(editNote).append(deleteNote);
+    rightControls.append(reminderControl).append(editNote).append(deleteNote);
     sControls.append(leftControls).append(rightControls);
     return sControls;
 };
@@ -400,6 +406,7 @@ SBN.renderNotes = function () {
     SBN.__renderNotePositions();
     $(".draggableStickyNote").draggable({ containment: "parent", stack: ".stickynote", stop: SBN.saveNotePositions, cancel: ".sControls" });
     $('.sControls').on('click', '.pinNote', SBN.pinStickyNote);
+    $('.sControls').on('click', '.reminderControl', SBN.reminderControl);
     $('.sControls').on('click', '.deleteNote', SBN.deleteStickyNote);
     $('.sControls').on('click', '.editNote', SBN.showEditModal);
 };
@@ -517,4 +524,18 @@ SBN.populateSelect = function (selectSelector, list) {
         $(selectSelector).append(option);
     }
     return true;
+};
+
+SBN.reminderControl = function () {
+    var indexId = $(this).attr('data-indexId');
+    var data = SBN.data[indexId];
+    if (data) {
+        if (data.reminderStatus === 'done') {
+            SBN.showEditModal(indexId);
+        } else if (data.reminderStatus === 'active' || data.reminderStatus === 'live') {
+            SBN.data[indexId].reminderStatus = 'done';
+            SBN.__config.requireSave = true;
+            SBN.renderNotes();
+        }
+    }
 };
