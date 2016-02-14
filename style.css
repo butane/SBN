@@ -20,8 +20,7 @@ body {
     background-color: #f5f5f5;
 }
 .stickynote {
-    min-width: 100px;
-    min-height: 100px;
+    min-width: 180px;
     max-width: 400px;
     float: left;
     background-color: #f9f9f9;
@@ -75,10 +74,19 @@ body {
 .leftControls {
     float: left;
     padding-left: 10px;
+    width: 20%;
+    text-align: left;
+}
+.centerControls {
+    float: left;
+    width: 40%;
+    text-align: center;
 }
 .rightControls {
-    float: right;
+    float: left;
     padding-right: 10px;
+    width: 40%;
+    text-align: right;
 }
 @keyframes reminderAnimation {
     0% {box-shadow: 5px 5px 5px rgba(200,0,0,1);}

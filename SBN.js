@@ -88,6 +88,7 @@ SBN.intervalJobs = function () {
         SBN.__config.intervalCount = 0; //Resets every hour
     }
     SBN.updateTime();
+    SBN.updateCountdownDisplays();
     if (SBN.__config.requireSave) {
         SBN.saveSBNData();
         SBN.__config.requireSave = false;
@@ -141,6 +142,25 @@ SBN.updateTime = function () {
     seconds = seconds<10?"0"+seconds:seconds;
     var timeString = hours + ":" + minutes + ":" + seconds + meridies;
     $('#currentTime').html(timeString);
+};
+
+SBN.updateCountdownDisplays = function () {
+    var now = new Date();
+    $('.countdown').each(function (index, element) {
+        var reminderTime = new Date($(element).attr('data-reminderTime'));
+        var diff = Math.floor((reminderTime - now)/1000);
+        diff = diff<0?0:diff;
+        var hours = Math.floor(diff/3600);
+        diff = diff%3600;
+        var minutes = Math.floor(diff/60);
+        diff = diff%60;
+        var seconds = diff;
+        hours = hours<10?"0"+hours:hours;
+        minutes = minutes<10?"0"+minutes:minutes;
+        seconds = seconds<10?"0"+seconds:seconds;
+        var timeString = hours + ":" + minutes + ":" + seconds;
+        $(element).html(timeString);
+    });
 };
 
 SBN.showAddNewModal = function () {
@@ -236,7 +256,7 @@ SBN.deleteStickyNote = function () {
 };
 
 SBN.showEditModal = function (indexId) {
-    if (typeof(indexId) === 'undefined') {
+    if (isNaN(indexId)) {
         indexId = $(this).attr('data-indexId');
     }
     var data = SBN.data[indexId];
@@ -295,8 +315,10 @@ SBN.updateStickyNote = function () {
 SBN.__stickyNoteControls = function (indexId) {
     var sControls = $('<div>').addClass('sControls');
     var leftControls = $('<div>').addClass('leftControls');
+    var centerControls = $('<div>').addClass('centerControls');
     var rightControls = $('<div>').addClass('rightControls');
     var pinNote = $('<span>').addClass('glyphicon glyphicon-pushpin text-muted pinNote').attr('data-indexId', indexId);
+    var countdown = $('<span>');
     var reminderControl = $('<span>').addClass('glyphicon glyphicon-time text-muted reminderControl').attr('data-indexId', indexId);
     var editNote = $('<span>').addClass('glyphicon glyphicon-edit text-muted editNote').attr('data-indexId', indexId);
     var deleteNote = $('<span>').addClass('glyphicon glyphicon-remove text-muted deleteNote').attr('data-indexId', indexId);
@@ -305,6 +327,7 @@ SBN.__stickyNoteControls = function (indexId) {
     }
     if (SBN.data[indexId] && (SBN.data[indexId].reminderStatus==='active' || SBN.data[indexId].reminderStatus==='live')) {
         reminderControl.removeClass('text-muted').addClass('text-success');
+        countdown.addClass('text-muted countdown').attr('data-reminderTime', SBN.data[indexId].reminderTime);
     }
     if (SBN.__config.deleteStage.indexId===indexId) {
         if (SBN.__config.deleteStage.stage===0) {
@@ -314,8 +337,9 @@ SBN.__stickyNoteControls = function (indexId) {
         }
     }
     leftControls.append(pinNote);
+    centerControls.append(countdown);
     rightControls.append(reminderControl).append(editNote).append(deleteNote);
-    sControls.append(leftControls).append(rightControls);
+    sControls.append(leftControls).append(centerControls).append(rightControls);
     return sControls;
 };
 
