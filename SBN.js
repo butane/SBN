@@ -73,7 +73,6 @@ SBN.data = new Array();
 SBN.__config = {
     intervalCount: 0,
     requireSave: false,
-    requireRender: false,
     deleteStage: {indexId: false, stage: false, lastUpdate: false},
     addNoteModalState: 0,
     editNoteModalState: 0
@@ -93,10 +92,6 @@ SBN.intervalJobs = function () {
         SBN.saveSBNData();
         SBN.__config.requireSave = false;
     }
-    if (SBN.__config.requireRender) {
-        SBN.renderNotes();
-        SBN.__config.requireRender = false;
-    }
     if (SBN.__config.intervalCount%10===0) { //Every 10 seconds
         if (SBN.__config.deleteStage.lastUpdate && (Date.now() - SBN.__config.deleteStage.lastUpdate > 10000)) {
             SBN.__config.deleteStage.indexId = false;
@@ -108,7 +103,7 @@ SBN.intervalJobs = function () {
         for (i in SBN.data) {
             var reminderTime = new Date(SBN.data[i].reminderTime);
             if (now >= reminderTime) {
-                SBN.__config.requireRender = true;
+                SBN.renderNotes();
                 break;
             }
         }
