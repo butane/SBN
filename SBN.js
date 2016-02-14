@@ -148,17 +148,24 @@ SBN.updateCountdownDisplays = function () {
     var now = new Date();
     $('.countdown').each(function (index, element) {
         var reminderTime = new Date($(element).attr('data-reminderTime'));
+        var timeString = "";
         var diff = Math.floor((reminderTime - now)/1000);
         diff = diff<0?0:diff;
-        var hours = Math.floor(diff/3600);
-        diff = diff%3600;
-        var minutes = Math.floor(diff/60);
-        diff = diff%60;
-        var seconds = diff;
-        hours = hours<10?"0"+hours:hours;
-        minutes = minutes<10?"0"+minutes:minutes;
-        seconds = seconds<10?"0"+seconds:seconds;
-        var timeString = hours + ":" + minutes + ":" + seconds;
+        var days = Math.floor(diff/86400);
+        if (days<4) {
+            var hours = Math.floor(diff/3600);
+            diff = diff%3600;
+            var minutes = Math.floor(diff/60);
+            diff = diff%60;
+            var seconds = diff;
+            hours = hours<10?"0"+hours:hours;
+            minutes = minutes<10?"0"+minutes:minutes;
+            seconds = seconds<10?"0"+seconds:seconds;
+            timeString = hours + ":" + minutes + ":" + seconds;
+        } else {
+            var monthList = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            timeString = monthList[reminderTime.getMonth()]+" "+reminderTime.getDate()+", "+reminderTime.getFullYear();
+        }
         $(element).html(timeString);
     });
 };
