@@ -403,9 +403,11 @@ SBN.__renderNotePositions = function () {
         var currentPos = $(e).position();
         if (!SBN.data[i].left) {
             SBN.data[i].left = currentPos.left;
+            SBN.__config.requireSave = true;
         }
         if (!SBN.data[i].top) {
             SBN.data[i].top = currentPos.top;
+            SBN.__config.requireSave = true;
         }
         var destinationPos = {
             left: SBN.data[i].left,
@@ -419,6 +421,7 @@ SBN.__renderNotePositions = function () {
         };
         $(e).css({
             position: 'relative',
+            height: $(e).height(),
             top: relativePos.top+"px",
             left: relativePos.left+"px",
             "z-index": relativePos.zIndex
