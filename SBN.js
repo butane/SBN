@@ -60,6 +60,17 @@ $('document').ready(function () {
             SBN.showAddNewModal();
         }
     });
+    if ('Notification' in window) {
+        if (Notification.permission === 'granted') {
+            SBN.__config.notificationsEnabled = true;
+        } else if (Notification.permission !== 'denied') {
+            Notification.requestPermission(function (permission) {
+                if (permission === 'granted') {
+                    SBN.__config.notificationsEnabled = true;
+                }
+            });
+        }
+    }
     SBN.fetchSBNData();
     SBN.renderNotes();
     SBN.updateTime();
@@ -75,7 +86,8 @@ SBN.__config = {
     requireSave: false,
     deleteStage: {indexId: false, stage: false, lastUpdate: false},
     addNoteModalState: 0,
-    editNoteModalState: 0
+    editNoteModalState: 0,
+    notificationsEnabled: false
 };
 
 SBN.config = {
@@ -101,6 +113,11 @@ SBN.intervalJobs = function () {
             if (now >= reminderTime) {
                 SBN.data[i].reminderStatus = 'live';
                 newLiveReminder = true;
+                if (SBN.__config.notificationsEnabled) {
+                    new Notification(SBN.data[i].title, {
+                        body: SBN.data[i].description
+                    });
+                }
             }
         }
     }
