@@ -213,7 +213,8 @@ SBN.addStickyNote = function () {
             title: title,
             description: description,
             reminderTime: reminderTime,
-            reminderStatus: reminderStatus
+            reminderStatus: reminderStatus,
+            zIndex: 999
         };
         SBN.data.push(sNote);
         SBN.__config.requireSave = true;
