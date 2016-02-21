@@ -209,11 +209,14 @@ SBN.addStickyNote = function () {
         if (now >= reminderTime) {
             reminderStatus = 'done';
         }
+        var position = SBN.findFreeSpace();
         var sNote = {
             title: title,
             description: description,
             reminderTime: reminderTime,
             reminderStatus: reminderStatus,
+            left: position.left,
+            top: position.top,
             zIndex: 999
         };
         SBN.data.push(sNote);
@@ -573,4 +576,26 @@ SBN.reminderControl = function () {
             SBN.renderNotes();
         }
     }
+};
+
+SBN.findFreeSpace = function () {
+    var notesArea = {
+        x1: 15,
+        y1: 60,
+        x2: $('#notesContainer').width()+15,
+        y2: $('#notesContainer').height()+60
+    };
+    console.log(notesArea);
+    SBN.drawTestBox(notesArea.x1, notesArea.y1, notesArea.x2-notesArea.x1, notesArea.y2-notesArea.y1, '#ff0000');
+    
+    var position = {};
+    position.left = 500;
+    position.top = 300;
+    return position;
+};
+
+//For testing purpose only - To be removed
+SBN.drawTestBox = function (left, top, width, height, color) {
+    var box = $('<div>').css({position: 'absolute', top: top, left: left, width: width-2, height: height-2, 'background-color': color, opacity: 0.4, border: '1px solid black'});
+    $('body').append(box);
 };
