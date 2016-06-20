@@ -6,7 +6,7 @@ body {
     padding-top: 60px;
     padding-bottom: 65px;
     height: 100%;
-    
+
     -webkit-user-select: none; /* webkit (safari, chrome) browsers */
     -moz-user-select: none; /* mozilla browsers */
     -khtml-user-select: none; /* webkit (konqueror) browsers */
@@ -21,6 +21,7 @@ body {
 }
 #notesContainer {
     height: 100%;
+    overflow: hidden;
 }
 .stickynote {
     min-width: 230px;

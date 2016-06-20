@@ -226,11 +226,14 @@ SBN.addStickyNote = function () {
         if (now >= reminderTime) {
             reminderStatus = 'done';
         }
+        var position = SBN.findFreeSpace();
         var sNote = {
             title: title,
             description: description,
             reminderTime: reminderTime,
             reminderStatus: reminderStatus,
+            left: position.left,
+            top: position.top,
             zIndex: 999
         };
         SBN.data.push(sNote);
@@ -590,4 +593,127 @@ SBN.reminderControl = function () {
             SBN.renderNotes();
         }
     }
+};
+
+SBN.__findRenderedNotesPosition = function () {
+  var notes = new Array();
+  $('.stickynote').each(function (i, e) {
+      notes.push({
+        x1: $(e).position().left,
+        y1: $(e).position().top,
+        x2: $(e).position().left + $(e).width() + 5,
+        y2: $(e).position().top + $(e).height() + 5
+      });
+  });
+  return notes;
+};
+
+SBN.__isEmpty = function (cell, notes) {
+  var note;
+  var isEmpty = true;
+  for (i in notes) {
+    note = notes[i];
+    if (cell.x2 < note.x1) {
+      continue;
+    } else if (cell.x1 > note.x2) {
+      continue;
+    } else if (cell.y2 < note.y1) {
+      continue;
+    } else if (cell.y1 > note.y2) {
+      continue;
+    } else {
+      isEmpty = false;
+      break;
+    }
+  }
+  return isEmpty;
+};
+
+SBN.__createGrid = function (notesArea) {
+    var rows = 40;
+    var cols = 60;
+    var grid = new Array();
+    grid.data = new Array();
+    grid.row_height = (notesArea.y2-notesArea.y1)/rows;
+    grid.col_width = (notesArea.x2-notesArea.x1)/cols;
+    var grid_pos;
+    var notes = SBN.__findRenderedNotesPosition();
+    for (var i=0; i<rows; i++) {
+      grid.data[i] = new Array();
+      for (var j=0; j<cols; j++) {
+        grid_pos = {
+          x1: Math.floor((j*grid.col_width)+notesArea.x1),
+          y1: Math.floor((i*grid.row_height)+notesArea.y1),
+          x2: Math.floor((j*grid.col_width)+notesArea.x1+grid.col_width),
+          y2: Math.floor((i*grid.row_height)+notesArea.y1+grid.row_height)
+        };
+        if (SBN.__isEmpty(grid_pos, notes)) {
+          grid.data[i][j] = 0;
+        } else {
+          grid.data[i][j] = 1;
+        }
+      }
+    }
+    return grid;
+};
+
+SBN.__maximalRectangle = function (grid) {
+  var area = function (x1, y1, x2, y2) {
+    if (x2<=x1 || y2<=y1) {
+      return 0;
+    }
+    return ((x2-x1)*(y2-y1));
+  };
+  var all_zeros = function (x1, y1, x2, y2) {
+    for (var i=x1; i <=x2; i++) {
+      for (var j=y1; j<=y2; j++) {
+        if (grid.data[i][j] === 1) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+  var m_x1 = 0;
+  var m_y1 = 0;
+  var m_x2 = 0;
+  var m_y2 = 0;
+  for (var x1=0; x1<grid.data.length; x1++) {
+    for (var y1=0; y1<=grid.data[x1].length; y1++) {
+      for (var x2=x1; x2<grid.data.length; x2++) {
+        for (var y2=y1; y2<grid.data[x2].length; y2++) {
+          if (area(x1, y1, x2, y2) > area(m_x1, m_y1, m_x2, m_y2)) {
+            if (all_zeros(x1, y1, x2, y2)) {
+              m_x1 = x1;
+              m_y1 = y1;
+              m_x2 = x2;
+              m_y2 = y2;
+            }
+          }
+        }
+      }
+    }
+  }
+  return {x1: m_x1, y1: m_y1, x2: m_x2, y2: m_y2};
+};
+
+SBN.findFreeSpace = function () {
+    var notesArea = {
+        x1: 15,
+        y1: 60,
+        x2: $('#notesContainer').width()+15,
+        y2: $('#notesContainer').height()+60
+    };
+    var grid = SBN.__createGrid(notesArea);
+    var maxRect = SBN.__maximalRectangle(grid);
+    var maxRectPos = {
+      x1: Math.floor((maxRect.y1*grid.col_width)+notesArea.x1),
+      y1: Math.floor((maxRect.x1*grid.row_height)+notesArea.y1),
+      x2: Math.floor((maxRect.y2*grid.col_width)+notesArea.x1),
+      y2: Math.floor((maxRect.x2*grid.row_height)+notesArea.y1)
+    };
+    var position = {};
+    position.left = maxRectPos.x1;
+    position.top = maxRectPos.y1;
+    return position;
 };
