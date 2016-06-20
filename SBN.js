@@ -649,10 +649,8 @@ SBN.__createGrid = function (notesArea) {
         };
         if (SBN.__isEmpty(grid_pos, notes)) {
           grid.data[i][j] = 0;
-          //SBN.drawTestBox(grid_pos.x1, grid_pos.y1, grid_pos.x2-grid_pos.x1, grid_pos.y2-grid_pos.y1, '#00ff00');
         } else {
           grid.data[i][j] = 1;
-          //SBN.drawTestBox(grid_pos.x1, grid_pos.y1, grid_pos.x2-grid_pos.x1, grid_pos.y2-grid_pos.y1, '#ff0000');
         }
       }
     }
@@ -714,16 +712,8 @@ SBN.findFreeSpace = function () {
       x2: Math.floor((maxRect.y2*grid.col_width)+notesArea.x1),
       y2: Math.floor((maxRect.x2*grid.row_height)+notesArea.y1)
     };
-    SBN.drawTestBox(maxRectPos.x1, maxRectPos.y1, maxRectPos.x2-maxRectPos.x1, maxRectPos.y2-maxRectPos.y1, '#0000ff');
-
     var position = {};
     position.left = maxRectPos.x1;
     position.top = maxRectPos.y1;
     return position;
-};
-
-//For testing purpose only - To be removed
-SBN.drawTestBox = function (left, top, width, height, color) {
-    var box = $('<div>').css({position: 'absolute', top: top, left: left, width: width-2, height: height-2, 'background-color': color, opacity: 0.4, border: '1px solid black'});
-    $('body').append(box);
 };
