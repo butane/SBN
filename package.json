@@ -1,0 +1,16 @@
+{
+  "name": "sbn",
+  "version": "0.0.1",
+  "description": "Sticky Browser Notes",
+  "repository": {
+    "type": "git",
+    "url": "https://www.github.com/butane/SBN.git"
+  },
+  "keywords": [
+    "Sticky",
+    "Browser",
+    "Notes"
+  ],
+  "author": "Vivek Dinesh",
+  "license": "MIT"
+}
