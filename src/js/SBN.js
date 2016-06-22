@@ -79,7 +79,7 @@ $('document').ready(function () {
 
 SBN = {};
 
-SBN.data = new Array();
+SBN.data = [];
 
 SBN.__config = {
     intervalCount: 0,
@@ -107,7 +107,7 @@ SBN.intervalJobs = function () {
     }
     var now = new Date();
     var newLiveReminder = false;
-    for (i in SBN.data) {
+    for (var i in SBN.data) {
         if (SBN.data[i].reminderStatus === 'active') {
             var reminderTime = new Date(SBN.data[i].reminderTime);
             if (now >= reminderTime) {
@@ -375,7 +375,7 @@ SBN.__escapeHTML = function (data) {
     if (typeof(data) === "string") {
         var result = "";
         if (data.length>0) {
-            for (i in data) {
+            for (var i in data) {
                 if (data[i] === '&') {
                     result += '&amp;';
                 } else if (data[i] === '<') {
@@ -454,7 +454,7 @@ SBN.renderNotes = function () {
     $('#notesContainer').html('');
     if (SBN.data.length > 0) {
         var notes = SBN.data;
-        for (i in notes) {
+        for (var i in notes) {
             $('#notesContainer').append(SBN.__stickyNote(notes[i], i));
         }
     }
@@ -506,7 +506,7 @@ SBN.toggleTimeFormat = function () {
 SBN.__yearList = function () {
     var start = 2016;
     var count = 10;
-    var list = new Array();
+    var list = [];
     for (var i=start; i<start+count; i++) {
         list.push({value: i, display: i});
     }
@@ -515,7 +515,7 @@ SBN.__yearList = function () {
 
 SBN.__monthList = function () {
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var list = new Array();
+    var list = [];
     for (var i=1; i<=12; i++) {
         list.push({value: i, display: months[i-1]});
     }
@@ -529,7 +529,7 @@ SBN.__dayList = function (year, month) {
     year = parseInt(year);
     month = parseInt(month);
     var dayCount = 31;
-    var list = new Array();
+    var list = [];
     if ([4,6,9,11].indexOf(month) > -1) {
         dayCount = 30;
     }
@@ -553,7 +553,7 @@ SBN.__dayList = function (year, month) {
 };
 
 SBN.__hourList = function () {
-    var list = new Array();
+    var list = [];
     for (var i=0; i<24; i++) {
         var display = i<10?"0"+i:i.toString();
         list.push({value: i, display: display});
@@ -562,7 +562,7 @@ SBN.__hourList = function () {
 };
 
 SBN.__60List = function () {
-    var list = new Array();
+    var list = [];
     for (var i=0; i<60; i++) {
         var display = i<10?"0"+i:i.toString();
         list.push({value: i, display: display});
@@ -572,7 +572,7 @@ SBN.__60List = function () {
 
 SBN.populateSelect = function (selectSelector, list) {
     $(selectSelector).html('');
-    for (i in list) {
+    for (var i in list) {
         var option = $('<option>');
         option.val(list[i].value);
         option.html(list[i].display);
@@ -596,7 +596,7 @@ SBN.reminderControl = function () {
 };
 
 SBN.__findRenderedNotesPosition = function () {
-  var notes = new Array();
+  var notes = [];
   $('.stickynote').each(function (i, e) {
       notes.push({
         x1: $(e).position().left,
@@ -611,7 +611,7 @@ SBN.__findRenderedNotesPosition = function () {
 SBN.__isEmpty = function (cell, notes) {
   var note;
   var isEmpty = true;
-  for (i in notes) {
+  for (var i in notes) {
     note = notes[i];
     if (cell.x2 < note.x1) {
       continue;
@@ -632,14 +632,14 @@ SBN.__isEmpty = function (cell, notes) {
 SBN.__createGrid = function (notesArea) {
     var rows = 40;
     var cols = 60;
-    var grid = new Array();
-    grid.data = new Array();
+    var grid = [];
+    grid.data = [];
     grid.row_height = (notesArea.y2-notesArea.y1)/rows;
     grid.col_width = (notesArea.x2-notesArea.x1)/cols;
     var grid_pos;
     var notes = SBN.__findRenderedNotesPosition();
     for (var i=0; i<rows; i++) {
-      grid.data[i] = new Array();
+      grid.data[i] = [];
       for (var j=0; j<cols; j++) {
         grid_pos = {
           x1: Math.floor((j*grid.col_width)+notesArea.x1),
