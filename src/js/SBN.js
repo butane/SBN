@@ -394,7 +394,9 @@ SBN.__escapeHTML = function (data) {
 
 SBN.__processText = function (data) {
     if (typeof(data) === "string") {
-        data = data.replace(new RegExp("\n", 'g'), "<br>");
+        data = marked(data, {
+            breaks: true
+        });
     }
     return data;
 };

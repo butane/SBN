@@ -25,7 +25,7 @@ body {
 }
 .stickynote {
     min-width: 230px;
-    max-width: 400px;
+    max-width: 600px;
     float: left;
     background-color: #f9f9f9;
     margin: 5px;
@@ -52,8 +52,9 @@ body {
 }
 .sDescription {
     padding: 0 10px 20px 10px;
-    text-align: center;
     word-wrap: break-word;
+    max-height: 500px;
+    overflow-y: scroll;
 }
 .sControls {
     display: none;
