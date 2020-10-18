@@ -708,6 +708,7 @@ SBN.findFreeSpace = function () {
 };
 
 SBN.__markdownQuickReference = function () {
+    // Text from https://marked.js.org/ demo page
     return `Markdown Quick Reference
 ========================
 
