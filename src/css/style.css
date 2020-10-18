@@ -38,6 +38,10 @@ body {
 .ui-draggable-dragging {
     cursor: move;
 }
+#addMarkdownHelper {
+    margin-top: 7px;
+    cursor: pointer;
+}
 #currentTime {
     text-align: center;
     cursor: pointer;
