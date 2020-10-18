@@ -371,23 +371,9 @@ SBN.__stickyNoteControls = function (indexId) {
     return sControls;
 };
 
-SBN.__escapeHTML = function (data) {
+SBN.__sanitizeHTML = function (data) {
     if (typeof(data) === "string") {
-        var result = "";
-        if (data.length>0) {
-            for (var i in data) {
-                if (data[i] === '&') {
-                    result += '&amp;';
-                } else if (data[i] === '<') {
-                    result += '&lt;';
-                } else if (data[i] === '>') {
-                    result += '&gt;';
-                } else {
-                    result += data[i];
-                }
-            }
-        }
-        return result;
+        return DOMPurify.sanitize(data);
     }
     return false;
 };
@@ -405,8 +391,8 @@ SBN.__stickyNote = function (note, indexId) {
     var sWrapper = $('<div>').addClass('stickynote');
     var sTitle = $('<div>').addClass('sTitle');
     var sDescription = $('<div>').addClass('sDescription');
-    sTitle.html(SBN.__escapeHTML(note.title));
-    sDescription.html(SBN.__processText(SBN.__escapeHTML(note.description)));
+    sTitle.html(SBN.__sanitizeHTML(SBN.__processText(note.title)));
+    sDescription.html(SBN.__sanitizeHTML(SBN.__processText(note.description)));
     sWrapper.append(sTitle).append(sDescription).append(SBN.__stickyNoteControls(indexId));
     if (!note.pinned || note.pinned===false) {
         sWrapper.addClass('draggableStickyNote');
