@@ -36,6 +36,17 @@ module.exports = function (grunt) {
           'dist/index.html': 'src/index.html'
         }
       }
+    },
+    copy: {
+      main: {
+        files: [
+          {
+            expand: true,
+            src: ['src/js/lib/**'],
+            dest: 'dist/js/lib'
+          }
+        ]
+      }
     }
   });
 
@@ -44,8 +55,9 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
 
-  grunt.registerTask('default', ['jshint', 'clean', 'uglify', 'cssmin', 'htmlmin']);
+  grunt.registerTask('default', ['jshint', 'clean', 'uglify', 'cssmin', 'htmlmin', 'copy']);
 
 };
