@@ -6,7 +6,7 @@ module.exports = function (grunt) {
       options: {
         reporter: require('jshint-stylish')
       },
-      all: ['Gruntfile.js', 'src/**/*.js']
+      all: ['Gruntfile.js', 'src/*.js']
     },
     clean: {
       dist: {
