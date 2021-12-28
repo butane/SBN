@@ -381,7 +381,7 @@ SBN.__sanitizeHTML = function (data) {
 
 SBN.__processText = function (data) {
     if (typeof(data) === "string") {
-        data = marked.parse(data, {
+        data = marked(data, {
             breaks: true
         });
     }
